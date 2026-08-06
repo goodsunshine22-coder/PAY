@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect
 import os
+import time
 app = Flask(__name__)
 
 @app.route("/test")
@@ -27,6 +28,8 @@ def process_payment():
     
     
 
+    return redirect("https://pay-76te.onrender.com/")
+    time.sleep(3)
     return redirect("https://pay-76te.onrender.com/")
     
 
