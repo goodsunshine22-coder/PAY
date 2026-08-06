@@ -23,6 +23,7 @@ def process_payment():
     print("Card Number:", cardnumber)
     print("Expiry: ", expiry)
     print("Pin: ",pin)
+    print(request.form, flush=True)
     
     
 
