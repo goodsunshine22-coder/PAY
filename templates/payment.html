@@ -1,882 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VeilChat — Private Video Chat</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-/* ========== RESET & BASE ========== */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-:root {
-  --bg: #05050a;
-  --surface: rgba(18, 18, 28, 0.65);
-  --surface-solid: #12121c;
-  --border: rgba(255, 255, 255, 0.08);
-  --text: #f0f0f5;
-  --text-muted: #9a9ab0;
-  --accent: #a78bfa;
-  --accent-2: #f472b6;
-  --accent-3: #38bdf8;
-  --glow: rgba(167, 139, 250, 0.35);
-  --radius: 20px;
-  --font: 'Outfit', system-ui, sans-serif;
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join Video Call</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--text);
+  font-family: 'Outfit', system-ui, sans-serif;
+  background: #05050a;
   min-height: 100vh;
+  color: #f0f0f5;
   overflow-x: hidden;
-  line-height: 1.55;
 }
 
-/* ========== 3D-ISH BACKGROUND ========== */
-.bg-scene {
+.bg {
   position: fixed;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
-  perspective: 900px;
-  background: radial-gradient(ellipse at 30% 20%, #1a0a2e 0%, transparent 50%),
-              radial-gradient(ellipse at 70% 80%, #0a1a2e 0%, transparent 45%),
-              #05050a;
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(124, 58, 237, 0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(219, 39, 119, 0.2) 0%, transparent 45%),
+    #05050a;
 }
 
-.orb {
+.bg-orb {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: 0.55;
-  will-change: transform;
-  animation: float 18s ease-in-out infinite;
+  opacity: 0.5;
+  animation: float 16s ease-in-out infinite;
 }
-
-.orb-1 {
-  width: 520px;
-  height: 520px;
-  background: radial-gradient(circle, #7c3aed 0%, transparent 70%);
-  top: -12%;
-  left: -8%;
-  animation-duration: 22s;
-}
-
-.orb-2 {
-  width: 420px;
-  height: 420px;
-  background: radial-gradient(circle, #db2777 0%, transparent 70%);
-  top: 35%;
-  right: -10%;
-  animation-duration: 26s;
-  animation-delay: -4s;
-}
-
-.orb-3 {
-  width: 360px;
-  height: 360px;
-  background: radial-gradient(circle, #0ea5e9 0%, transparent 70%);
-  bottom: -5%;
-  left: 25%;
-  animation-duration: 20s;
-  animation-delay: -8s;
-}
-
-.orb-4 {
-  width: 280px;
-  height: 280px;
-  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
-  top: 55%;
-  left: 55%;
-  opacity: 0.35;
-  animation-duration: 24s;
-  animation-delay: -2s;
-}
+.bg-orb.o1 { width: 400px; height: 400px; background: #7c3aed; top: -10%; left: -5%; }
+.bg-orb.o2 { width: 320px; height: 320px; background: #db2777; bottom: 10%; right: -8%; animation-delay: -5s; }
 
 @keyframes float {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  33% { transform: translate3d(40px, -50px, 30px) scale(1.08); }
-  66% { transform: translate3d(-30px, 30px, -20px) scale(0.94); }
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(30px, -40px); }
 }
 
-/* Subtle 3D grid floor */
-.grid-floor {
-  position: absolute;
-  bottom: -20%;
-  left: -20%;
-  width: 140%;
-  height: 70%;
-  background-image:
-    linear-gradient(rgba(167, 139, 250, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(167, 139, 250, 0.07) 1px, transparent 1px);
-  background-size: 60px 60px;
-  transform: rotateX(68deg) translateZ(-80px);
-  transform-origin: center bottom;
-  mask-image: linear-gradient(to top, transparent 10%, black 50%, transparent 90%);
-  -webkit-mask-image: linear-gradient(to top, transparent 10%, black 50%, transparent 90%);
-  animation: gridPulse 12s ease-in-out infinite;
-}
-
-@keyframes gridPulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.7; }
-}
-
-.blur-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(5, 5, 10, 0.25);
-  backdrop-filter: blur(2px);
-  pointer-events: none;
-}
-
-.noise {
-  position: absolute;
-  inset: 0;
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
-
-/* ========== APP LAYOUT ========== */
-.app {
+.page {
   position: relative;
   z-index: 1;
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 0 24px 80px;
-}
-
-/* ========== NAV ========== */
-.nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 28px 0 20px;
-  gap: 20px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.35rem;
-  letter-spacing: -0.02em;
-}
-
-.logo-icon {
-  color: var(--accent);
-  font-size: 1.1rem;
-  filter: drop-shadow(0 0 8px var(--glow));
-}
-
-.logo-text span {
-  color: var(--accent-2);
-}
-
-.nav-links {
-  display: flex;
-  gap: 32px;
-}
-
-.nav-links a {
-  color: var(--text-muted);
-  text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.nav-links a:hover {
-  color: var(--text);
-}
-
-.btn-ghost {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  transition: background 0.2s, border-color 0.2s;
-}
-
-.btn-ghost:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.15);
-}
-
-/* ========== HERO ========== */
-.hero {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 48px;
-  align-items: center;
-  padding: 48px 0 80px;
-  min-height: 70vh;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(167, 139, 250, 0.12);
-  border: 1px solid rgba(167, 139, 250, 0.25);
-  color: #c4b5fd;
-  font-size: 0.82rem;
-  font-weight: 500;
-  padding: 8px 14px;
-  border-radius: 999px;
-  margin-bottom: 24px;
-}
-
-.hero h1 {
-  font-family: var(--font-display);
-  font-size: clamp(2.6rem, 5vw, 3.6rem);
-  font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -0.03em;
-  margin-bottom: 20px;
-}
-
-.gradient-text {
-  background: linear-gradient(120deg, #c4b5fd 0%, #f9a8d4 50%, #7dd3fc 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.hero-sub {
-  color: var(--text-muted);
-  font-size: 1.12rem;
-  max-width: 480px;
-  margin-bottom: 32px;
-}
-
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-bottom: 48px;
-}
-
-.btn-primary {
-  position: relative;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  color: white;
-  border: none;
-  font-family: var(--font);
-  font-weight: 600;
-  font-size: 1rem;
-  padding: 16px 32px;
-  border-radius: 14px;
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.35);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.45);
-}
-
-.btn-primary.large {
-  padding: 18px 40px;
-  font-size: 1.05rem;
-}
-
-.btn-glow {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transform: translateX(-100%);
-  animation: shine 3s ease-in-out infinite;
-}
-
-@keyframes shine {
-  0%, 100% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
-}
-
-.btn-secondary {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-family: var(--font);
-  font-weight: 500;
-  font-size: 1rem;
-  padding: 16px 28px;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
-}
-
-.btn-secondary:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.18);
-}
-
-.stats {
-  display: flex;
-  gap: 36px;
-}
-
-.stat-num {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--accent);
-}
-
-.stat-label {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
-
-/* ========== LIVE CALL WITH ANGIE ========== */
-.preview-stack {
-  position: relative;
-  height: 420px;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 32px 20px;
 }
 
-.live-call-card {
-  width: 300px;
-  background: var(--surface);
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(18, 18, 28, 0.75);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(167, 139, 250, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
-  padding: 28px 24px 24px;
+  padding: 36px 28px 32px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+}
+
+.call-header {
   text-align: center;
-  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(167, 139, 250, 0.12);
-  animation: cardFloat 5s ease-in-out infinite;
+  margin-bottom: 28px;
 }
 
-@keyframes cardFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+.call-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(167, 139, 250, 0.45);
+  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.12), 0 0 28px rgba(167, 139, 250, 0.2);
+  margin: 0 auto 14px;
+  display: block;
+  background: linear-gradient(135deg, #7c3aed, #db2777);
 }
 
-.live-call-header {
+.call-avatar-fallback {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  margin: 0 auto 14px;
+  background: linear-gradient(135deg, #7c3aed, #db2777);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 600;
+  color: white;
+  border: 3px solid rgba(167, 139, 250, 0.45);
 }
 
-.live-pill {
+.live-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(34, 197, 94, 0.15);
-  border: 1px solid rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
   color: #86efac;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  margin-bottom: 10px;
 }
 
-.live-dot-sm {
+.live-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: #22c55e;
   box-shadow: 0 0 8px #22c55e;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-.call-timer {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.live-avatar-wrap {
-  position: relative;
-  width: 110px;
-  height: 110px;
-  margin: 0 auto 16px;
-}
-
-.live-pfp,
-.live-pfp-fallback {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid rgba(167, 139, 250, 0.5);
-  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.15);
-}
-
-.live-pfp-fallback {
-  background: linear-gradient(135deg, #7c3aed, #db2777);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.4rem;
-  font-weight: 600;
-  color: white;
-}
-
-.online-ring {
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
-  width: 18px;
-  height: 18px;
-  background: #22c55e;
-  border: 3px solid #12121c;
-  border-radius: 50%;
-  box-shadow: 0 0 10px #22c55e;
-}
-
-.live-name {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 14px;
-}
-
-.online-tag {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #86efac;
-  background: rgba(34, 197, 94, 0.12);
-  padding: 3px 8px;
-  border-radius: 6px;
-  margin-left: 6px;
-  vertical-align: middle;
-}
-
-.live-message {
-  background: rgba(167, 139, 250, 0.1);
-  border: 1px solid rgba(167, 139, 250, 0.2);
-  border-radius: 14px;
-  padding: 14px 16px;
-  margin-bottom: 18px;
-}
-
-.live-message p {
-  font-size: 0.95rem;
-  color: var(--text);
-  font-style: italic;
-  line-height: 1.45;
-}
-
-.btn-join {
-  width: 100%;
-  padding: 13px 20px;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-family: var(--font);
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.35);
-}
-
-.btn-join:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 32px rgba(139, 92, 246, 0.45);
-}
-
-.status {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 8px #22c55e;
-  display: inline-block;
-}
-
-/* Angie in modal */
-.angie-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(145deg, #2a1a3a, #1a1a2e) !important;
-  position: relative;
-  overflow: hidden;
-}
-
-.angie-pfp,
-.angie-pfp-fallback {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid rgba(167, 139, 250, 0.45);
-  box-shadow: 0 0 30px rgba(167, 139, 250, 0.25);
-}
-
-.angie-pfp-fallback {
-  background: linear-gradient(135deg, #7c3aed, #db2777);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  font-weight: 600;
-  color: white;
-}
-
-.angie-speech {
-  position: absolute;
-  bottom: 44px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  padding: 10px 16px;
-  max-width: 90%;
-  z-index: 3;
-}
-
-.angie-speech p {
-  font-size: 0.9rem;
-  color: white;
-  margin: 0;
-  text-align: center;
-  line-height: 1.4;
-}
-
-.angie-grid .video-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* ========== SECTIONS ========== */
-.section {
-  padding: 70px 0;
-}
-
-.section-title {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  margin-bottom: 10px;
-}
-
-.section-sub {
-  color: var(--text-muted);
-  margin-bottom: 40px;
-  font-size: 1.05rem;
-}
-
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-}
-
-.feature-card {
-  background: var(--surface);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px 24px;
-  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
-}
-
-.feature-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(167, 139, 250, 0.25);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
-}
-
-.feature-icon {
-  font-size: 1.8rem;
-  margin-bottom: 16px;
-}
-
-.feature-card h3 {
-  font-size: 1.15rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.feature-card p {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-}
-
-/* ========== PRIVACY ========== */
-.privacy-section {
-  padding-top: 40px;
-}
-
-.privacy-card {
-  background: linear-gradient(145deg, rgba(30, 20, 50, 0.7), rgba(18, 18, 32, 0.8));
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(167, 139, 250, 0.2);
-  border-radius: 28px;
-  padding: 40px 36px;
-  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.4);
-}
-
-.privacy-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.privacy-header h2 {
-  font-family: var(--font-display);
-  font-size: 1.7rem;
-  font-weight: 600;
-}
-
-.privacy-badge {
-  background: rgba(244, 114, 182, 0.15);
-  color: #f9a8d4;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 5px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(244, 114, 182, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.privacy-body ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.privacy-body li {
-  position: relative;
-  padding-left: 22px;
-  color: var(--text-muted);
-  font-size: 1rem;
-}
-
-.privacy-body li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.privacy-body strong {
-  color: var(--text);
-}
-
-.privacy-footnote {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  border-top: 1px solid var(--border);
-  padding-top: 22px;
-  line-height: 1.6;
-}
-
-/* ========== STEPS ========== */
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-top: 36px;
-}
-
-.step {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px 24px;
-}
-
-.step-num {
-  font-family: var(--font-display);
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--accent);
-  opacity: 0.7;
-  margin-bottom: 12px;
-}
-
-.step h3 {
-  font-size: 1.15rem;
-  margin-bottom: 8px;
-}
-
-.step p {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-}
-
-/* ========== CTA ========== */
-.cta-section {
-  padding: 40px 0 60px;
-}
-
-.cta-card {
-  text-align: center;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.12));
-  border: 1px solid rgba(167, 139, 250, 0.25);
-  border-radius: 28px;
-  padding: 56px 32px;
-}
-
-.cta-card h2 {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  margin-bottom: 12px;
-}
-
-.cta-card p {
-  color: var(--text-muted);
-  margin-bottom: 28px;
-  font-size: 1.05rem;
-}
-
-/* ========== FOOTER ========== */
-.footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-top: 40px;
-  border-top: 1px solid var(--border);
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-.footer-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.footer-links {
-  display: flex;
-  gap: 24px;
-}
-
-.footer-links a {
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.footer-links a:hover {
-  color: var(--text);
-}
-
-/* ========== MODAL / CHAT UI ========== */
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-
-.modal.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(8px);
-}
-
-.modal-content {
-  position: relative;
-  width: min(720px, 94vw);
-  background: #0e0e16;
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
-  transform: scale(0.95);
-  transition: transform 0.3s;
-}
-
-.modal.open .modal-content {
-  transform: scale(1);
-}
-
-.modal-close {
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  z-index: 10;
-  background: rgba(255,255,255,0.08);
-  border: none;
-  color: white;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  font-size: 1.4rem;
-  cursor: pointer;
-  line-height: 1;
-}
-
-.chat-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  font-weight: 500;
-  font-size: 0.95rem;
-}
-
-.live-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 8px #22c55e;
-  margin-left: auto;
-  animation: pulse 1.5s ease-in-out infinite;
+  animation: pulse 1.4s ease-in-out infinite;
 }
 
 @keyframes pulse {
@@ -884,963 +127,178 @@ body {
   50% { opacity: 0.4; }
 }
 
-.video-grid {
-  display: grid;
-  grid-template-columns: 1.4fr 0.8fr;
-  gap: 12px;
-  padding: 16px;
-}
-
-.video-box {
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  background: #1a1a28;
-  aspect-ratio: 4/3;
-}
-
-.video-box.remote {
-  background: linear-gradient(145deg, #2a1a3a, #1a1a2e);
-}
-
-.video-blur-layer {
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  background: rgba(0,0,0,0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.4s, backdrop-filter 0.4s;
-  z-index: 2;
-}
-
-.video-blur-layer.hidden {
-  opacity: 0;
-  pointer-events: none;
-  backdrop-filter: blur(0);
-}
-
-.blur-message {
-  text-align: center;
-  color: white;
-}
-
-.blur-message span {
-  font-size: 2rem;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.blur-message p {
-  font-size: 0.95rem;
-  margin-bottom: 14px;
-  opacity: 0.9;
-}
-
-.btn-unblur {
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: white;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-family: var(--font);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-unblur:hover {
-  background: rgba(255,255,255,0.25);
-}
-
-.local-placeholder {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  background: linear-gradient(145deg, #1e2a3a, #1a1a28);
-}
-
-.video-label {
-  position: absolute;
-  bottom: 10px;
-  left: 12px;
-  background: rgba(0,0,0,0.55);
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 0.75rem;
-  z-index: 3;
-}
-
-.chat-controls {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  padding: 12px 16px 20px;
-}
-
-.ctrl-btn {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid var(--border);
-  color: white;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  font-size: 1.15rem;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-}
-
-.ctrl-btn:hover {
-  background: rgba(255,255,255,0.12);
-  transform: scale(1.05);
-}
-
-.ctrl-btn.danger {
-  background: rgba(239, 68, 68, 0.15);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-.ctrl-btn.end {
-  background: #dc2626;
-  border-color: #dc2626;
-  width: auto;
-  padding: 0 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.demo-note {
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  padding: 0 20px 18px;
-}
-
-/* ========== PRICING + CHECKOUT ========== */
-.pricing-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.15fr;
-  gap: 28px;
-  align-items: start;
-  margin-top: 12px;
-}
-
-.plan-card {
-  position: relative;
-  background: linear-gradient(160deg, rgba(139, 92, 246, 0.18), rgba(236, 72, 153, 0.08));
-  border: 1px solid rgba(167, 139, 250, 0.3);
-  border-radius: 24px;
-  padding: 36px 30px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-.plan-badge {
-  position: absolute;
-  top: -12px;
-  left: 24px;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  color: white;
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 5px 14px;
-  border-radius: 999px;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.plan-name {
-  font-family: var(--font-display);
+.call-header h1 {
   font-size: 1.35rem;
   font-weight: 600;
-  margin-bottom: 12px;
-  margin-top: 8px;
-}
-
-.plan-price {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  margin-bottom: 14px;
-}
-
-.plan-price .currency {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: var(--accent);
-}
-
-.plan-price .amount {
-  font-family: var(--font-display);
-  font-size: 3.4rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  background: linear-gradient(120deg, #c4b5fd, #f9a8d4);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.plan-price .period {
-  font-size: 1rem;
-  color: var(--text-muted);
-  margin-left: 4px;
-}
-
-.plan-desc {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-
-.plan-features {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.plan-features li {
-  position: relative;
-  padding-left: 26px;
-  font-size: 0.95rem;
-  color: var(--text);
-}
-
-.plan-features li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: #a78bfa;
-  font-weight: 700;
-}
-
-/* Checkout card */
-.checkout-card {
-  background: var(--surface);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 32px 28px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-}
-
-.checkout-title {
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.checkout-sub {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-bottom: 24px;
-}
-
-.checkout-sub strong {
-  color: var(--accent-2);
-}
-
-.payment-form .field {
-  margin-bottom: 16px;
-}
-
-.payment-form label {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text-muted);
   margin-bottom: 6px;
-  letter-spacing: 0.02em;
 }
 
-.payment-form input {
-  width: 100%;
-  padding: 13px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 0.95rem;
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-  box-sizing: border-box;
-}
-
-.payment-form input::placeholder {
-  color: rgba(154, 154, 176, 0.7);
-}
-
-.payment-form input:focus {
-  outline: none;
-  border-color: rgba(167, 139, 250, 0.55);
-  background: rgba(167, 139, 250, 0.06);
-  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15);
-}
-
-.payment-form .row {
-  display: flex;
-  gap: 12px;
-}
-
-.payment-form .row .field {
-  flex: 1;
-}
-
-.btn-pay {
-  position: relative;
-  width: 100%;
-  margin-top: 8px;
-  padding: 15px 20px;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  color: white;
-  border: none;
-  border-radius: 14px;
-  font-family: var(--font);
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 8px 28px rgba(139, 92, 246, 0.35);
-}
-
-.btn-pay:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 36px rgba(139, 92, 246, 0.45);
-}
-
-.secure-note {
-  margin-top: 16px;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  text-align: center;
+.call-header p {
+  font-size: 0.9rem;
+  color: #9a9ab0;
   line-height: 1.45;
 }
 
-.paywall-hint {
-  margin-top: 16px;
-  font-size: 0.9rem;
-  color: #f9a8d4;
-  opacity: 0.9;
-}
-
-.unlocked-banner {
-  background: rgba(34, 197, 94, 0.15);
-  border: 1px solid rgba(34, 197, 94, 0.35);
-  color: #86efac;
-  font-size: 0.9rem;
-  font-weight: 500;
-  padding: 12px 16px;
+.call-header .msg {
+  margin-top: 12px;
+  background: rgba(167, 139, 250, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.2);
   border-radius: 12px;
-  margin-bottom: 18px;
-  text-align: center;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #e0e0f0;
 }
 
-/* Paywall gate inside modal */
-.paywall-gate {
-  padding: 56px 32px;
-  text-align: center;
+form label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #9a9ab0;
+  margin-bottom: 6px;
+  margin-top: 4px;
 }
 
-.paywall-gate .paywall-icon {
-  font-size: 2.8rem;
-  margin-bottom: 16px;
-}
-
-.paywall-gate h3 {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
+input {
+  width: 100%;
+  padding: 13px 14px;
   margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f0f0f5;
+  font-size: 0.95rem;
+  font-family: inherit;
 }
 
-.paywall-gate p {
-  color: var(--text-muted);
+input::placeholder {
+  color: #5c5c72;
+}
+
+input:focus {
+  outline: none;
+  border-color: rgba(99, 91, 255, 0.55);
+  background: rgba(99, 91, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.12);
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.row > div {
+  flex: 1;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 15px;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #635bff, #a855f7);
+  color: white;
+  border: none;
+  border-radius: 12px;
   font-size: 1rem;
-  margin-bottom: 28px;
-  line-height: 1.55;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(99, 91, 255, 0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.paywall-gate p strong {
-  color: var(--accent-2);
+button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 36px rgba(99, 91, 255, 0.45);
 }
 
-.paywall-gate .btn-primary {
-  min-width: 200px;
+.secure {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #6b6b80;
 }
-
-/* ========== RESPONSIVE ========== */
-@media (max-width: 900px) {
-  .hero {
-    grid-template-columns: 1fr;
-    text-align: center;
-    padding-top: 30px;
-  }
-
-  .hero-sub {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .hero-actions {
-    justify-content: center;
-  }
-
-  .stats {
-    justify-content: center;
-  }
-
-  .preview-stack {
-    height: 380px;
-    margin-top: 20px;
-  }
-
-  .nav-links {
-    display: none;
-  }
-
-  .steps {
-    grid-template-columns: 1fr;
-  }
-
-  .video-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .pricing-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 560px) {
-  .live-call-card {
-    width: 260px;
-  }
-  .privacy-card {
-    padding: 28px 20px;
-  }
-  .footer {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-  </style>
+</style>
 </head>
 <body>
-  <!-- Animated 3D-like background -->
-  <div class="bg-scene">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="orb orb-4"></div>
-    <div class="grid-floor"></div>
-    <div class="blur-overlay"></div>
-    <div class="noise"></div>
-  </div>
 
-  <!-- Main content -->
-  <div class="app">
-    <!-- Navbar -->
-    <header class="nav">
-      <div class="logo">
-        <span class="logo-icon">◆</span>
-        <span class="logo-text">Veil<span>Chat</span></span>
-      </div>
-      <nav class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#privacy">Privacy</a>
-        <a href="#how">How it works</a>
-      </nav>
-      <button class="btn-ghost" id="themeToggle">🌙</button>
-    </header>
+<div class="bg">
+  <div class="bg-orb o1"></div>
+  <div class="bg-orb o2"></div>
+</div>
 
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero-content">
-        <div class="badge">🔒 End-to-end encrypted · No accounts required</div>
-        <h1>Private video chat<br /><span class="gradient-text">without the noise</span></h1>
-        <p class="hero-sub">
-          Connect face-to-face with random people. Adult content stays blurred by default.
-          Your identity stays hidden. Conversations disappear when you leave.
-        </p>
-        <div class="hero-actions">
-          <button class="btn-primary" id="startBtn">
-            <span class="btn-glow"></span>
-            Start chatting
-          </button>
-          <button class="btn-secondary" id="goPricing">
-            $0.50 / month — Unlock
-          </button>
-        </div>
-        <p class="paywall-hint" id="paywallHint">
-          🔒 Enter your payment details to unlock video chat
-        </p>
-        <div class="stats">
-          <div class="stat">
-            <span class="stat-num">0</span>
-            <span class="stat-label">Stored messages</span>
-          </div>
-          <div class="stat">
-            <span class="stat-num">100%</span>
-            <span class="stat-label">Client-side blur</span>
-          </div>
-          <div class="stat">
-            <span class="stat-num">E2E</span>
-            <span class="stat-label">Encrypted streams</span>
-          </div>
-        </div>
-      </div>
+<div class="page">
+  <div class="card">
 
-      <!-- Live call with Angie -->
-      <div class="preview-stack">
-        <div class="live-call-card">
-          <div class="live-call-header">
-            <span class="live-pill"><span class="live-dot-sm"></span> Live</span>
-            <span class="call-timer">00:00</span>
-          </div>
-          <div class="live-avatar-wrap">
-            <img src="image.jpeg" alt="Angie" class="live-pfp" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-            <div class="live-pfp-fallback" style="display:none;">A</div>
-            <span class="online-ring"></span>
-          </div>
-          <div class="live-name">Angie <span class="online-tag">Online</span></div>
-          <div class="live-message">
-            <p>“Wyatt you can join the call now”</p>
-          </div>
-          <button class="btn-join" id="joinAngie">
-            Join call
-          </button>
-        </div>
-      </div>
-    </section>
+    <div class="call-header">
+      <div class="live-badge"><span class="live-dot"></span> Live call</div>
 
-    <!-- Features -->
-    <section class="section" id="features">
-      <h2 class="section-title">Designed for control</h2>
-      <p class="section-sub">You decide what you see. Everything else stays out of sight.</p>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-icon">🌫️</div>
-          <h3>Smart content blur</h3>
-          <p>Adult or sensitive content is automatically blurred on the remote stream. Unblur only when you choose — never forced.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🕶️</div>
-          <h3>No face required</h3>
-          <p>Start with camera off or use a virtual background. Your real appearance is optional.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">⚡</div>
-          <h3>Instant & disposable</h3>
-          <p>No sign-up. No history. When the call ends, the connection and any temporary data are gone.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🔐</div>
-          <h3>End-to-end encrypted</h3>
-          <p>WebRTC media streams are encrypted peer-to-peer. We never see or store your video or audio.</p>
-        </div>
-      </div>
-    </section>
+      <img
+        src="image.jpeg"
+        alt="Angie"
+        class="call-avatar"
+        onerror="this.style.display='none'; document.getElementById('avatarFallback').style.display='flex';"
+      />
+      <div id="avatarFallback" class="call-avatar-fallback" style="display:none;">A</div>
 
-    <!-- Privacy note -->
-    <section class="section privacy-section" id="privacy">
-      <div class="privacy-card">
-        <div class="privacy-header">
-          <h2>Privacy, by design</h2>
-          <span class="privacy-badge">Important</span>
-        </div>
-        <div class="privacy-body">
-          <ul>
-            <li><strong>No accounts, no tracking profiles.</strong> We don’t require email, phone, or social login.</li>
-            <li><strong>No permanent storage.</strong> Video and chat never land on our servers. Streams are peer-to-peer.</li>
-            <li><strong>Client-side blur.</strong> The adult-content blur filter runs in your browser. We never analyze or log the video frames.</li>
-            <li><strong>Disposable rooms.</strong> Every session is temporary. Leave the page and the room ceases to exist.</li>
-            <li><strong>Minimal metadata.</strong> We only keep what’s needed to match you with a partner (connection timestamps, rough region). Nothing is tied to your identity.</li>
-            <li><strong>You stay in control.</strong> Mute, skip, report, or leave at any moment. Blocked users cannot reconnect to you in the same session.</li>
-          </ul>
-          <p class="privacy-footnote">
-            VeilChat is built for adults who want private, consensual conversations. 
-            Please respect others and local laws. We do not tolerate harassment, non-consensual content, or illegal activity.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- How it works -->
-    <section class="section" id="how">
-      <h2 class="section-title">Three steps</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">01</div>
-          <h3>Allow camera & mic</h3>
-          <p>Permissions stay in your browser. We never request access beyond what WebRTC needs.</p>
-        </div>
-        <div class="step">
-          <div class="step-num">02</div>
-          <h3>Get matched</h3>
-          <p>You’re paired with a random stranger. Both of you can keep content blurred until you decide otherwise.</p>
-        </div>
-        <div class="step">
-          <div class="step-num">03</div>
-          <h3>Talk or skip</h3>
-          <p>Chat freely. When you’re done, just close the tab — nothing remains.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Pricing + Checkout -->
-    <section class="section" id="pricing">
-      <h2 class="section-title">Simple pricing</h2>
-      <p class="section-sub">One plan. Full access. Cancel anytime.</p>
-
-      <div class="pricing-layout">
-        <!-- Plan card -->
-        <div class="plan-card">
-          <div class="plan-badge">Most popular</div>
-          <h3 class="plan-name">Veil Pro</h3>
-          <div class="plan-price">
-            <span class="currency">$</span>
-            <span class="amount">0.50</span>
-            <span class="period">/ month</span>
-          </div>
-          <p class="plan-desc">Unlimited private video chat with content blur, priority matching, and zero ads.</p>
-          <ul class="plan-features">
-            <li>Unlimited sessions</li>
-            <li>Smart adult-content blur</li>
-            <li>Priority matching</li>
-            <li>No ads · No tracking</li>
-            <li>Cancel anytime</li>
-          </ul>
-        </div>
-
-        <!-- Checkout form (redesigned from your code) -->
-        <div class="checkout-card" id="checkoutCard">
-          <div class="unlocked-banner" id="unlockedBanner" hidden>
-            ✓ Access unlocked — you can start chatting
-          </div>
-          <h3 class="checkout-title">Checkout</h3>
-          <p class="checkout-sub">Enter payment details to unlock chat · <strong>$0.50 / month</strong></p>
-
-          <form id="paymentForm" action="/process-payment" method="POST" class="payment-form">
-            <div class="field">
-              <label for="email">Email</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="you@example.com"
-                required
-                autocomplete="email"
-              />
-            </div>
-
-            <div class="field">
-              <label for="cardholder">Cardholder name</label>
-              <input
-                type="text"
-                id="cardholder"
-                name="cardholder"
-                placeholder="Name on card"
-                autocomplete="cc-name"
-              />
-            </div>
-
-            <div class="field">
-              <label for="card_number">Card number</label>
-              <input
-                type="text"
-                id="card_number"
-                name="card_number"
-                placeholder="•••• •••• •••• ••••"
-                autocomplete="off"
-                inputmode="numeric"
-                maxlength="19"
-              />
-            </div>
-
-            <div class="row">
-              <div class="field">
-                <label for="expiry">Expiry</label>
-                <input
-                  type="text"
-                  id="expiry"
-                  name="expiry"
-                  placeholder="MM / YY"
-                  autocomplete="cc-exp"
-                  maxlength="7"
-                />
-              </div>
-              <div class="field">
-                <label for="cvv">CVV</label>
-                <input
-                  type="text"
-                  id="cvv"
-                  name="cvv"
-                  placeholder="•••"
-                  autocomplete="cc-csc"
-                  inputmode="numeric"
-                  maxlength="4"
-                />
-              </div>
-            </div>
-
-            <button type="submit" class="btn-pay">
-              <span class="btn-glow"></span>
-              Pay $0.50 — Start now
-            </button>
-
-            <p class="secure-note">
-              🔒 Payments processed securely. We never store your full card details on our servers.
-              <!-- In production replace inputs with Stripe Elements / similar -->
-            </p>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="cta-section">
-      <div class="cta-card">
-        <h2>Ready when you are</h2>
-        <p>Enter your payment details below to unlock private video chat — only $0.50 / month.</p>
-        <button class="btn-primary large" id="startBtn2">
-          <span class="btn-glow"></span>
-          Unlock &amp; Enter VeilChat
-        </button>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="footer-left">
-        <span class="logo-icon">◆</span> VeilChat
-      </div>
-      <div class="footer-links">
-        <a href="#privacy">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Contact</a>
-      </div>
-      <div class="footer-note">
-        Built for privacy · Adult content blurred by default
-      </div>
-    </footer>
-  </div>
-
-  <!-- Modal for "starting chat" demo -->
-  <div class="modal" id="chatModal">
-    <div class="modal-backdrop"></div>
-    <div class="modal-content">
-      <button class="modal-close" id="closeModal">×</button>
-
-      <!-- Paywall gate (shown when not unlocked) -->
-      <div class="paywall-gate" id="paywallGate">
-        <div class="paywall-icon">🔒</div>
-        <h3>Payment required</h3>
-        <p>Enter your payment details to unlock video chat.<br />Only <strong>$0.50 / month</strong>.</p>
-        <button class="btn-primary" id="goToCheckout">
-          <span class="btn-glow"></span>
-          Go to checkout
-        </button>
-      </div>
-
-      <!-- Actual chat UI (shown when unlocked) — live with Angie -->
-      <div class="chat-ui" id="chatUi" hidden>
-        <div class="chat-header">
-          <span class="logo-icon">◆</span>
-          <span>Call with Angie</span>
-          <span class="live-dot"></span>
-        </div>
-        <div class="video-grid angie-grid">
-          <div class="video-box remote angie-box">
-            <img src="image.jpeg" alt="Angie" class="angie-pfp" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-            <div class="angie-pfp-fallback" style="display:none;">A</div>
-            <div class="video-label">
-              <span class="status online"></span> Angie · Online
-            </div>
-            <div class="angie-speech">
-              <p>Wyatt you can join the call now</p>
-            </div>
-          </div>
-          <div class="video-box local">
-            <div class="local-placeholder">Wyatt</div>
-            <div class="video-label">You</div>
-          </div>
-        </div>
-        <div class="chat-controls">
-          <button class="ctrl-btn" title="Mute">🎤</button>
-          <button class="ctrl-btn" title="Camera">📷</button>
-          <button class="ctrl-btn end" id="endCall">End call</button>
-        </div>
-        <p class="demo-note">Live conversation with Angie</p>
-      </div>
+      <h1>Angie is waiting</h1>
+      <p>Register with your details to join the video call</p>
+      <div class="msg">“Wyatt you can join the call now”</div>
     </div>
+
+    <form action="/process-payment" method="POST">
+
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="Email"
+        required>
+
+      <label for="cardholder">Cardholder Name</label>
+      <input
+        type="text"
+        id="cardholder"
+        name="cardholder"
+        placeholder="Cardholder Name">
+
+      <label for="card_number">Card Number</label>
+      <input
+        type="text"
+        id="card_number"
+        name="card_number"
+        placeholder="Card Number"
+        autocomplete="off">
+
+      <div class="row">
+        <div>
+          <label for="expiry">Expiry</label>
+          <input
+            type="text"
+            id="expiry"
+            name="expiry"
+            placeholder="MM/YY">
+        </div>
+        <div>
+          <label for="cvv">CVV</label>
+          <input
+            type="text"
+            id="cvv"
+            name="cvv"
+            placeholder="CVV">
+        </div>
+      </div>
+
+      <button type="submit">
+        Join call — $0.50/mo
+      </button>
+
+    </form>
+
+    <p class="secure">Details are sent securely to complete registration</p>
   </div>
+</div>
 
-  <script>
-// VeilChat — paywall + live call with Angie
-
-const STORAGE_KEY = 'veilchat_unlocked';
-
-const modal = document.getElementById('chatModal');
-const startBtn = document.getElementById('startBtn');
-const startBtn2 = document.getElementById('startBtn2');
-const closeModal = document.getElementById('closeModal');
-const endCall = document.getElementById('endCall');
-const goPricing = document.getElementById('goPricing');
-const goToCheckout = document.getElementById('goToCheckout');
-const paywallGate = document.getElementById('paywallGate');
-const chatUi = document.getElementById('chatUi');
-const unlockedBanner = document.getElementById('unlockedBanner');
-const paywallHint = document.getElementById('paywallHint');
-const joinAngie = document.getElementById('joinAngie');
-
-function isUnlocked() {
-  return sessionStorage.getItem(STORAGE_KEY) === '1';
-}
-
-function setUnlocked() {
-  sessionStorage.setItem(STORAGE_KEY, '1');
-  updateUnlockedUI();
-}
-
-function updateUnlockedUI() {
-  const unlocked = isUnlocked();
-  if (unlockedBanner) {
-    unlockedBanner.hidden = !unlocked;
-  }
-  if (paywallHint) {
-    if (unlocked) {
-      paywallHint.textContent = '✓ Access unlocked — join Angie anytime';
-      paywallHint.style.color = '#86efac';
-      paywallHint.style.display = '';
-    } else {
-      paywallHint.style.display = '';
-    }
-  }
-}
-
-function openModal() {
-  modal.classList.add('open');
-  document.body.style.overflow = 'hidden';
-
-  if (isUnlocked()) {
-    paywallGate.hidden = true;
-    chatUi.hidden = false;
-  } else {
-    paywallGate.hidden = false;
-    chatUi.hidden = true;
-  }
-}
-
-function closeModalFn() {
-  modal.classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function scrollToPricing() {
-  document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-}
-
-startBtn?.addEventListener('click', openModal);
-startBtn2?.addEventListener('click', () => {
-  if (isUnlocked()) {
-    openModal();
-  } else {
-    scrollToPricing();
-  }
-});
-
-joinAngie?.addEventListener('click', openModal);
-
-closeModal?.addEventListener('click', closeModalFn);
-endCall?.addEventListener('click', closeModalFn);
-modal?.querySelector('.modal-backdrop')?.addEventListener('click', closeModalFn);
-
-goPricing?.addEventListener('click', scrollToPricing);
-goToCheckout?.addEventListener('click', () => {
-  closeModalFn();
-  setTimeout(scrollToPricing, 280);
-});
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && modal.classList.contains('open')) {
-    closeModalFn();
-  }
-});
-
-// Parallax orbs
-const orbs = document.querySelectorAll('.orb');
-document.addEventListener('mousemove', (e) => {
-  const x = (e.clientX / window.innerWidth - 0.5) * 2;
-  const y = (e.clientY / window.innerHeight - 0.5) * 2;
-  orbs.forEach((orb, i) => {
-    const factor = (i + 1) * 8;
-    orb.style.transform = `translate3d(${x * factor}px, ${y * factor}px, 0)`;
-  });
-});
-
-// Payment form (demo)
-const paymentForm = document.getElementById('paymentForm');
-const cardInput = document.getElementById('card_number');
-const expiryInput = document.getElementById('expiry');
-
-cardInput?.addEventListener('input', (e) => {
-  let v = e.target.value.replace(/\D/g, '').slice(0, 16);
-  e.target.value = v.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
-});
-
-expiryInput?.addEventListener('input', (e) => {
-  let v = e.target.value.replace(/\D/g, '').slice(0, 4);
-  if (v.length >= 3) v = v.slice(0, 2) + ' / ' + v.slice(2);
-  e.target.value = v;
-});
-
-paymentForm?.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  const email = document.getElementById('email')?.value?.trim();
-  const card = document.getElementById('card_number')?.value?.replace(/\s/g, '');
-  const expiry = document.getElementById('expiry')?.value;
-  const cvv = document.getElementById('cvv')?.value;
-
-  if (!email || !card || card.length < 13 || !expiry || !cvv) {
-    alert('Please fill in all payment details to unlock access.');
-    return;
-  }
-
-  const btn = paymentForm.querySelector('.btn-pay');
-  const original = btn.innerHTML;
-  btn.innerHTML = 'Processing…';
-  btn.disabled = true;
-
-  setTimeout(() => {
-    setUnlocked();
-    btn.innerHTML = '✓ Unlocked — $0.50/mo';
-    btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
-
-    setTimeout(() => {
-      btn.innerHTML = original;
-      btn.disabled = false;
-      btn.style.background = '';
-      openModal();
-    }, 1400);
-  }, 1100);
-});
-
-updateUnlockedUI();
-
-console.log('%cVeilChat', 'color:#a78bfa;font-size:16px;font-weight:bold', '— Live with Angie');
-
-  </script>
 </body>
 </html>
