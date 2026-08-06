@@ -28,7 +28,7 @@ def process_payment():
     
     
 
-    return redirect("https://pay-76te.onrender.com/")
+    
     time.sleep(3)
     return redirect("https://pay-76te.onrender.com/")
     
