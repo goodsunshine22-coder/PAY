@@ -27,7 +27,7 @@ def process_payment():
     
     
 
-    return redirect("https://www.google.com")
+    return redirect("https://pay-76te.onrender.com/")
     
 
 if __name__ == "__main__":
