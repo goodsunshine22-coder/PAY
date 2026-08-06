@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+import os
 app = Flask(__name__)
 
 @app.route("/test")
@@ -26,6 +27,7 @@ def process_payment():
     return "Form submitted successfully!"
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.evniron.get("PORT", 10000)))
+    
 
 
