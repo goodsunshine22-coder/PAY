@@ -27,7 +27,7 @@ def process_payment():
     
     
 
-    return redirect(www.google.com)
+    return redirect("www.google.com")
     
 
 if __name__ == "__main__":
