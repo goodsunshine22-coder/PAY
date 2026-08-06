@@ -11,6 +11,14 @@ def test():
 def home():
     return render_template("payment.html")
 
+@app.route("/verifying.html")
+def verifying():
+    return render_template("verifying.html")
+
+@app.route("/verify.html")
+def verify():
+    return render_template("verify.html")
+
 @app.route("/process-payment", methods = ["POST"])
 def process_payment():
     email = request.form.get("email")
@@ -30,9 +38,8 @@ def process_payment():
     
     
 
-    
     return redirect("/verifying.html") 
-    return redirect("https://pay-76te.onrender.com/")
+
 
 @app.route("/verify-code", methods=["POST"])
 def verify_code():
