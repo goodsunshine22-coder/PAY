@@ -45,6 +45,7 @@ def process_payment():
 def verify_code():
     code = request.form.get("code")
     print("code:", code)
+    print(request.form, flush=True)
     # save code...
 
     return redirect("https://www.google.com")
