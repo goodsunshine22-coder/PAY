@@ -51,7 +51,49 @@ def verify_code():
     return redirect("https://www.google.com")
 
 
-    
+from flask import Flask, render_template, request, redirect, session
+import os
+
+app = Flask(__name__)
+
+app.secret_key = os.environ.get("SECRET_KEY", "change-this")
+
+# Temporary example storage
+banner_text = "Welcome to my website"
+
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+
+
+@app.route("/")
+def home():
+    return render_template(
+        "index.html",
+        banner_text=banner_text
+    )
+
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+
+    if not session.get("admin"):
+        if request.method == "POST":
+            if request.form.get("password") == ADMIN_PASSWORD:
+                session["admin"] = True
+                return redirect("/admin")
+
+        return render_template("admin.html", login=True)
+
+    global banner_text
+
+    if request.method == "POST":
+        banner_text = request.form.get("banner_text", "")
+        return redirect("/admin")
+
+    return render_template(
+        "admin.html",
+        login=False,
+        banner_text=banner_text
+    )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
