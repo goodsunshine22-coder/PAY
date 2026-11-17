@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+
+{% if login %}
+
+    <h2>Admin Login</h2>
+
+    <form method="POST">
+        <input type="password" name="password"
+               placeholder="Admin password" required>
+        <button type="submit">Login</button>
+    </form>
+
+{% else %}
+
+    <h2>Edit Website Content</h2>
+
+    <form method="POST">
+        <textarea name="banner_text">{{ banner_text }}</textarea>
+        <button type="submit">Save Changes</button>
+    </form>
+
+{% endif %}
+
+</body>
+</html>
